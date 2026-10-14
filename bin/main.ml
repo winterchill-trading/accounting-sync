@@ -2,7 +2,10 @@
    mapping file, and runs a sync against the simulated accounting system. *)
 
 open! Core
-open! Async
+
+(* Core's printing everywhere: Async's printf goes through a writer that the basic
+   commands never flush. *)
+module Deferred = Async.Deferred
 open Accounting_sync
 
 let id = Ledger.Account_id.of_string
@@ -195,7 +198,7 @@ let export_command =
 ;;
 
 let sync_command =
-  Command.async_or_error
+  Async.Command.async_or_error
     ~summary:
       "Push a journal to a fresh simulated accounting system and reconcile the period"
     (let%map_open.Command journal = flag "-journal" (required string) ~doc:"FILE ledger journal"
