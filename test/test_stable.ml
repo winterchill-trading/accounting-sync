@@ -27,7 +27,8 @@ let%expect_test "stable bin_prot digests" =
     ; "Tracker", [%bin_digest: Tracker.Stable.V1.t]
     ]
     ~f:(fun (name, digest) -> printf "%-20s %s\n" name digest);
-  [%expect {|
+  [%expect
+    {|
     Account_code         d9a8da25d5656b016fb4dbdc2e4197fb
     Entry_key            d9a8da25d5656b016fb4dbdc2e4197fb
     Chart.Account_type   65757fe816f9c61e73473030788a7966
@@ -56,12 +57,18 @@ let round_trip (type a) (module M : Binable.S with type t = a) (x : a) =
 
 let%expect_test "values round trip through bin_prot and sexp; reading validates" =
   [%test_result: Chart.t] (round_trip (module Chart.Stable.V1) chart) ~expect:chart;
-  [%test_result: Chart.t] (Chart.Stable.V1.t_of_sexp (Chart.Stable.V1.sexp_of_t chart)) ~expect:chart;
-  [%test_result: Mapping.t] (round_trip (module Mapping.Stable.V1) full_mapping) ~expect:full_mapping;
+  [%test_result: Chart.t]
+    (Chart.Stable.V1.t_of_sexp (Chart.Stable.V1.sexp_of_t chart))
+    ~expect:chart;
+  [%test_result: Mapping.t]
+    (round_trip (module Mapping.Stable.V1) full_mapping)
+    ~expect:full_mapping;
   let tracker, _ =
     Tracker.stage Tracker.empty (Export.run ~mapping:full_mapping october).entries
   in
-  [%test_result: Tracker.t] (round_trip (module Tracker.Stable.V1) tracker) ~expect:tracker;
+  [%test_result: Tracker.t]
+    (round_trip (module Tracker.Stable.V1) tracker)
+    ~expect:tracker;
   [%test_result: Tracker.t]
     (Tracker.Stable.V1.t_of_sexp (Tracker.Stable.V1.sexp_of_t tracker))
     ~expect:tracker;
@@ -70,7 +77,9 @@ let%expect_test "values round trip through bin_prot and sexp; reading validates"
       (Period_lock.lock_through Period_lock.none (oct 3))
       (Period.of_date (oct 9))
   in
-  [%test_result: Period_lock.t] (round_trip (module Period_lock.Stable.V1) lock) ~expect:lock;
+  [%test_result: Period_lock.t]
+    (round_trip (module Period_lock.Stable.V1) lock)
+    ~expect:lock;
   print_s [%sexp (Period_lock.Stable.V1.sexp_of_t lock : Sexp.t)];
   let unbalanced =
     Sexp.of_string
@@ -83,7 +92,8 @@ let%expect_test "values round trip through bin_prot and sexp; reading validates"
     [%sexp
       (Or_error.try_with (fun () -> Journal_entry.Stable.V1.t_of_sexp unbalanced)
        : Journal_entry.t Or_error.t)];
-  [%expect {|
+  [%expect
+    {|
     ((through (2026-10-03)) (periods (2026-10)))
     (Error ("unbalanced entry" (key k:EUR) (debits_minus_credits "-1.00 EUR")))
     |}]

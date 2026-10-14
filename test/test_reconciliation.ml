@@ -6,16 +6,19 @@ let at = Time_ns.epoch
 
 (* Marks every entry posted without a remote system: the tracker is a plain value. *)
 let post_all tracker =
-  List.fold (Tracker.to_send tracker) ~init:tracker ~f:(fun t (pk, (e : Journal_entry.t)) ->
-    Tracker.apply
-      t
-      e.key
-      (Posted
-         { remote = Remote_id.of_string ("r-" ^ Push_key.to_string pk)
-         ; number = ""
-         ; at
-         })
-    |> Or_error.ok_exn)
+  List.fold
+    (Tracker.to_send tracker)
+    ~init:tracker
+    ~f:(fun t (pk, (e : Journal_entry.t)) ->
+      Tracker.apply
+        t
+        e.key
+        (Posted
+           { remote = Remote_id.of_string ("r-" ^ Push_key.to_string pk)
+           ; number = ""
+           ; at
+           })
+      |> Or_error.ok_exn)
 ;;
 
 let print r =
@@ -56,12 +59,15 @@ let recon ?all ?(mapping = full_mapping) tracker =
 
 let%expect_test "nothing pushed, everything pushed, a period with blocked entries" =
   print (recon Tracker.empty);
-  let tracker, _ = Tracker.stage Tracker.empty (Export.run ~mapping:full_mapping october).entries in
+  let tracker, _ =
+    Tracker.stage Tracker.empty (Export.run ~mapping:full_mapping october).entries
+  in
   let tracker = post_all tracker in
   print (recon tracker);
   print (recon ~all:true tracker);
   print (recon ~mapping tracker);
-  [%expect {|
+  [%expect
+    {|
     entries 7 matched 0 not_pushed 7 pending 0 rejected 0 changed 0 extra 0 blocked 0 -> false
       EUR exported 1842.50 (13 lines) posted 0.00 (0 lines)
       GBP exported 85.00 (2 lines) posted 0.00 (0 lines)
@@ -93,7 +99,9 @@ let%expect_test "nothing pushed, everything pushed, a period with blocked entrie
 ;;
 
 let%expect_test "an entry posted but no longer exported is extra" =
-  let tracker, _ = Tracker.stage Tracker.empty (Export.run ~mapping:full_mapping october).entries in
+  let tracker, _ =
+    Tracker.stage Tracker.empty (Export.run ~mapping:full_mapping october).entries
+  in
   let tracker = post_all tracker in
   let fewer =
     List.filter october ~f:(fun r ->
@@ -101,8 +109,10 @@ let%expect_test "an entry posted but no longer exported is extra" =
         (List.exists (Ledger.Record.entries r) ~f:(fun e ->
            String.equal (Ledger.Idempotency_key.to_string e.idempotency_key) "fee-1")))
   in
-  print (Reconciliation.run ~mapping:full_mapping ~from:(oct 1) ~to_:(oct 31) fewer tracker);
-  [%expect {|
+  print
+    (Reconciliation.run ~mapping:full_mapping ~from:(oct 1) ~to_:(oct 31) fewer tracker);
+  [%expect
+    {|
     entries 6 matched 6 not_pushed 0 pending 0 rejected 0 changed 0 extra 1 blocked 0 -> false
       EUR exported 1840.00 (11 lines) posted 1842.50 (13 lines)
       GBP exported 85.00 (2 lines) posted 85.00 (2 lines)

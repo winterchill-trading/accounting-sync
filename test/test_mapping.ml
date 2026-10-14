@@ -35,7 +35,8 @@ let%expect_test "rules from most to least specific" =
     "%s\n"
     (Mapping.resolve m (Ledger.Account_id.pending (id "customer:vip-7")) ~account:None
      |> Option.value_map ~default:"unmapped" ~f:Account_code.to_string);
-  [%expect {|
+  [%expect
+    {|
     customer:vip-7         2011
     customer:vip-8         2010
     customer:1             2000
@@ -51,13 +52,12 @@ let%expect_test "checking a mapping against a chart" =
     Mapping.set mapping (Prefix "suspense:") (code "9999")
     |> fun m -> Mapping.set m (Prefix "legacy:") (code "7777")
   in
-  print_s
-    [%sexp
-      (Mapping.check m ~chart ~categories : Mapping.Problem.t list)];
+  print_s [%sexp (Mapping.check m ~chart ~categories : Mapping.Problem.t list)];
   let m = Mapping.create_exn ~tracking:[ "region", "Region" ] [] in
   print_s [%sexp (Mapping.check m ~chart ~categories : Mapping.Problem.t list)];
   print_s [%sexp (Mapping.check mapping ~chart ~categories : Mapping.Problem.t list)];
-  [%expect {|
+  [%expect
+    {|
     ((Archived_code (rule (Prefix suspense:)) (code 9999))
      (Unknown_code (rule (Prefix legacy:)) (code 7777)))
     ((Unknown_category (category Region)))
@@ -68,11 +68,18 @@ let%expect_test "checking a mapping against a chart" =
 let%expect_test "duplicate rules are refused; set replaces" =
   print_s
     [%sexp
-      (Mapping.create [ Prefix "a", code "1"; Prefix "a", code "2" ] : Mapping.t Or_error.t)];
-  let m = Mapping.set (Mapping.create_exn [ Prefix "a", code "1" ]) (Prefix "a") (code "2") in
+      (Mapping.create [ Prefix "a", code "1"; Prefix "a", code "2" ]
+       : Mapping.t Or_error.t)];
+  let m =
+    Mapping.set (Mapping.create_exn [ Prefix "a", code "1" ]) (Prefix "a") (code "2")
+  in
   print_s [%sexp (Mapping.rules m : (Mapping.Rule.t * Account_code.t) list)];
-  print_s [%sexp (Mapping.rules (Mapping.remove m (Prefix "a")) : (Mapping.Rule.t * Account_code.t) list)];
-  [%expect {|
+  print_s
+    [%sexp
+      (Mapping.rules (Mapping.remove m (Prefix "a"))
+       : (Mapping.Rule.t * Account_code.t) list)];
+  [%expect
+    {|
     (Error ("rule mapped twice" (rule (Prefix a))))
     (((Prefix a) 2))
     ()
@@ -81,13 +88,15 @@ let%expect_test "duplicate rules are refused; set replaces" =
 
 let%expect_test "tracking from account tags" =
   let a = account "customer:1" Liability ~tags:[ "segment", "retail" ] in
-  print_s [%sexp (Mapping.tracking mapping ~account:(Some a) : Tracking.Assignment.t list)];
+  print_s
+    [%sexp (Mapping.tracking mapping ~account:(Some a) : Tracking.Assignment.t list)];
   print_s [%sexp (Mapping.tracking mapping ~account:None : Tracking.Assignment.t list)];
   print_s
     [%sexp
       (Tracking.check categories [ { category = "Cost centre"; option = "ops" } ]
        : unit Or_error.t)];
-  [%expect {|
+  [%expect
+    {|
     (((category "Cost centre") (option retail)))
     ()
     (Error ("unknown tracking option" (category "Cost centre") (option ops)))

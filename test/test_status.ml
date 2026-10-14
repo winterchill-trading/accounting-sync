@@ -38,7 +38,8 @@ let%expect_test "transition table" =
          | Ok s' -> Status.name s'
          | Error _ -> "-"));
     print_endline "");
-  [%expect {|
+  [%expect
+    {|
               accepted      posted        posted(other) rejected      voided        retry
     pending   submitted     posted        posted        rejected      voided        -
     submitted submitted     posted        -             rejected      voided        -

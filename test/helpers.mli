@@ -46,8 +46,8 @@ val mapping : Mapping.t
 (** The {!mapping} plus the card clearing account. *)
 val full_mapping : Mapping.t
 
-(** A month of activity on {!accounts}: deposits, a fee, an exchange as linked entries,
-    a card hold placed and captured, and a card settlement through the clearing account. *)
+(** A month of activity on {!accounts}: deposits, a fee, an exchange as linked entries, a
+    card hold placed and captured, and a card settlement through the clearing account. *)
 val october : Ledger.Record.t list
 
 val print_entry : Journal_entry.t -> unit

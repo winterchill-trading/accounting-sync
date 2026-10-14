@@ -13,7 +13,8 @@ let%expect_test "periods" =
     (Period.to_string (Period.prev (Period.of_date (Date.of_string "2026-01-05"))));
   print_s [%sexp (Period.of_string_or_error "2026-13" : Period.t Or_error.t)];
   print_s [%sexp (Period.of_string_or_error "2026-10" : Period.t Or_error.t)];
-  [%expect {|
+  [%expect
+    {|
     2024-02 2024-02-01..2024-02-29 next 2024-03 prev 2025-12
     (Error (("invalid period" 2026-13) (Failure "Month.of_int_exn 13")))
     (Ok 2026-10)
@@ -29,9 +30,11 @@ let%expect_test "locks: a lock date never moves back by itself; months lock on t
       (Period_lock.reopen_through lock (Some (oct 15)))
       (Period.of_date (Date.of_string "2026-12-01"))
   in
-  List.iter [ oct 15; oct 16; Date.of_string "2026-12-24"; Date.of_string "2026-11-30" ]
+  List.iter
+    [ oct 15; oct 16; Date.of_string "2026-12-24"; Date.of_string "2026-11-30" ]
     ~f:(fun d -> printf "%s %b\n" (Date.to_string d) (Period_lock.is_locked lock d));
-  [%expect {|
+  [%expect
+    {|
     (2026-10-31)
     2026-10-15 true
     2026-10-16 false
@@ -48,8 +51,20 @@ let%expect_test "batches never mix periods and skip locked ones" =
       ~transaction:(key "late")
       ~date:(Date.of_string "2026-09-30")
       ~currency:eur
-      [ { account = code "1000"; side = Debit; amount = amount "1.00 EUR"; description = ""; tracking = []; sources = [] }
-      ; { account = code "4000"; side = Credit; amount = amount "1.00 EUR"; description = ""; tracking = []; sources = [] }
+      [ { account = code "1000"
+        ; side = Debit
+        ; amount = amount "1.00 EUR"
+        ; description = ""
+        ; tracking = []
+        ; sources = []
+        }
+      ; { account = code "4000"
+        ; side = Credit
+        ; amount = amount "1.00 EUR"
+        ; description = ""
+        ; tracking = []
+        ; sources = []
+        }
       ]
     |> Or_error.ok_exn
   in
@@ -70,12 +85,17 @@ let%expect_test "batches never mix periods and skip locked ones" =
     printf
       "%s: %s\n"
       b.id
-      (String.concat ~sep:" " (List.map b.entries ~f:(fun e -> Entry_key.to_string e.key))));
+      (String.concat
+         ~sep:" "
+         (List.map b.entries ~f:(fun e -> Entry_key.to_string e.key))));
   printf
     "locked: %s\n"
-    (String.concat ~sep:" " (List.map plan.locked ~f:(fun e -> Entry_key.to_string e.key)));
+    (String.concat
+       ~sep:" "
+       (List.map plan.locked ~f:(fun e -> Entry_key.to_string e.key)));
   print_s [%sexp (Batch.plan ~max_entries:0 ~lock [] |> Or_error.is_ok : bool)];
-  [%expect {|
+  [%expect
+    {|
     2026-10/1: deposit-1:EUR deposit-2:EUR fee-1:EUR
     2026-10/2: fx-9:sell:EUR fx-9:sell:GBP settle-1:EUR
     2026-10/3: scheme-1:EUR

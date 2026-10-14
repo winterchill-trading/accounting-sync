@@ -60,7 +60,9 @@ let%expect_test "connect, push, repeat, reject and retry, change and void" =
     print_s [%sexp (before : Organisation.t list Or_error.t)];
     ok (Simulated.grant sim ~state:"st-81" ~organisations:[ acme; acme_eu ]);
     let%bind granted = Connector.complete_authorization c ~state:"st-81" >>| ok in
-    let conn = Connection.select conn ~state:"st-81" ~granted ~organisation:acme ~at:now |> ok in
+    let conn =
+      Connection.select conn ~state:"st-81" ~granted ~organisation:acme ~at:now |> ok
+    in
     print_s [%sexp (Connection.name conn : string)];
     let%bind again = Connector.complete_authorization c ~state:"st-81" in
     print_s [%sexp (again : Organisation.t list Or_error.t)];
@@ -124,7 +126,8 @@ let%expect_test "connect, push, repeat, reject and retry, change and void" =
     print_s [%sexp (Connection.name conn : string)];
     let%map r = Sync.push c acme tracker ~entries:export.entries ~now in
     print_s [%sexp (Result.is_error r : bool)]);
-  [%expect {|
+  [%expect
+    {|
     simulated://simulated/consent?state=st-81&organisation=Acme+Ltd
     (Ok ())
     connected
@@ -177,14 +180,15 @@ let%expect_test "connect, push, repeat, reject and retry, change and void" =
 let%expect_test "a remote lock refuses entries before sending; polling decides" =
   run (fun () ->
     let open Async_kernel in
-    let sim = Simulated.create ~decide_on_poll:true ~number_prefix:"MJ" ~chart ~categories () in
+    let sim =
+      Simulated.create ~decide_on_poll:true ~number_prefix:"MJ" ~chart ~categories ()
+    in
     let c = Simulated.connector sim in
-    Simulated.set_period_lock
-      sim
-      acme
-      (Period_lock.lock_through Period_lock.none (oct 4));
+    Simulated.set_period_lock sim acme (Period_lock.lock_through Period_lock.none (oct 4));
     let export = Export.run ~mapping:full_mapping october in
-    let%bind tracker, r = Sync.push c acme Tracker.empty ~entries:export.entries ~now >>| ok in
+    let%bind tracker, r =
+      Sync.push c acme Tracker.empty ~entries:export.entries ~now >>| ok
+    in
     print_run r;
     print_tracker tracker;
     let%bind tracker, p = Sync.poll c acme tracker ~now >>| ok in
@@ -198,17 +202,33 @@ let%expect_test "a remote lock refuses entries before sending; polling decides" 
         ~transaction:(key "x")
         ~date:(oct 20)
         ~currency:eur
-        [ { account = code "9999"; side = Debit; amount = amount "5.00 EUR"; description = ""; tracking = []; sources = [] }
-        ; { account = code "4000"; side = Credit; amount = amount "5.00 EUR"; description = ""; tracking = [ { category = "Cost centre"; option = "ops" } ]; sources = [] }
+        [ { account = code "9999"
+          ; side = Debit
+          ; amount = amount "5.00 EUR"
+          ; description = ""
+          ; tracking = []
+          ; sources = []
+          }
+        ; { account = code "4000"
+          ; side = Credit
+          ; amount = amount "5.00 EUR"
+          ; description = ""
+          ; tracking = [ { category = "Cost centre"; option = "ops" } ]
+          ; sources = []
+          }
         ]
       |> ok
     in
-    let%bind tracker, _ = Sync.push ~check:false c acme tracker ~entries:[ bad ] ~now >>| ok in
+    let%bind tracker, _ =
+      Sync.push ~check:false c acme tracker ~entries:[ bad ] ~now >>| ok
+    in
     let%map tracker, _ = Sync.poll c acme tracker ~now >>| ok in
     print_s
       [%sexp
-        (Option.map (Tracker.find tracker bad.key) ~f:(fun i -> i.status) : Status.t option)]);
-  [%expect {|
+        (Option.map (Tracker.find tracker bad.key) ~f:(fun i -> i.status)
+         : Status.t option)]);
+  [%expect
+    {|
     added 7 unchanged 0 changed 0 | refused locally 3 | batches 2026-10/1 | sent 4 accepted 4 posted 0 rejected 0
       deposit-1:EUR  attempt 1 rejected period_locked
       deposit-2:EUR  attempt 1 rejected period_locked

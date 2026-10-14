@@ -12,7 +12,10 @@ let debit a s = Ledger.Posting.debit (id a) (amount s)
 let credit a s = Ledger.Posting.credit (id a) (amount s)
 
 let noon day =
-  Time_ns.of_date_ofday ~zone:Time_float.Zone.utc (oct day) (Time_ns.Ofday.of_string "12:00")
+  Time_ns.of_date_ofday
+    ~zone:Time_float.Zone.utc
+    (oct day)
+    (Time_ns.Ofday.of_string "12:00")
 ;;
 
 let entry ?reference ?(tag = "transfer") ~day k postings =
@@ -26,10 +29,13 @@ let entry ?reference ?(tag = "transfer") ~day k postings =
   |> Or_error.ok_exn
 ;;
 
-let records events = List.mapi events ~f:(fun i event -> { Ledger.Record.seq = i + 1; event })
+let records events =
+  List.mapi events ~f:(fun i event -> { Ledger.Record.seq = i + 1; event })
+;;
 
 let open_ ?(tags = []) ?allow_negative s kind =
-  Ledger.Record.Event.Account_opened (Ledger.Account.create ?allow_negative ~tags (id s) kind)
+  Ledger.Record.Event.Account_opened
+    (Ledger.Account.create ?allow_negative ~tags (id s) kind)
 ;;
 
 let accounts =
@@ -53,7 +59,9 @@ let chart =
     ]
 ;;
 
-let categories = [ { Tracking.Category.name = "Cost centre"; options = [ "retail"; "business" ] } ]
+let categories =
+  [ { Tracking.Category.name = "Cost centre"; options = [ "retail"; "business" ] } ]
+;;
 
 let mapping =
   Mapping.create_exn
