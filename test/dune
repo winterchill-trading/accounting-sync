@@ -15,3 +15,7 @@
    (:standard -source-tree-root .)))
  (preprocess
   (pps ppx_jane)))
+
+(cram
+ (package accounting-sync)
+ (deps %{bin:accounting-sync}))
