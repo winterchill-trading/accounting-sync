@@ -21,14 +21,17 @@ let day d =
     (Time_ns.Ofday.of_string "12:00")
 ;;
 
-(* A month of a small bank's activity: deposits, a fee, an exchange booked as linked
-   legs, a card authorisation captured into card clearing, and the scheme settlement. *)
+(* A month of a small bank's activity: deposits, a fee, an exchange booked as linked legs,
+   a card authorisation captured into card clearing, and the scheme settlement. *)
 let write_example path =
   let open Or_error.Let_syntax in
   let%bind j = Ledger.Journal.create path in
   let ok r = Or_error.map r ~f:(fun (_ : Ledger.Journal.Append_result.t) -> ()) in
   let open_ ?(tags = []) ?allow_negative s kind =
-    ok (Ledger.Journal.open_account j (Ledger.Account.create ?allow_negative ~tags (id s) kind))
+    ok
+      (Ledger.Journal.open_account
+         j
+         (Ledger.Account.create ?allow_negative ~tags (id s) kind))
   in
   let%bind () = open_ "bank:central" Asset ~allow_negative:true in
   let%bind () = open_ "fx:settlement" Asset ~allow_negative:true in
@@ -48,15 +51,28 @@ let write_example path =
   in
   let open Ledger.Posting in
   let%bind () =
-    transfer "deposit-1" 1 ~reference:"SEPA in 77"
-      [ debit (id "bank:central") (eur "500.00"); credit (id "customer:1") (eur "500.00") ]
+    transfer
+      "deposit-1"
+      1
+      ~reference:"SEPA in 77"
+      [ debit (id "bank:central") (eur "500.00")
+      ; credit (id "customer:1") (eur "500.00")
+      ]
   in
   let%bind () =
-    transfer "deposit-2" 2 ~tag:"deposit"
-      [ debit (id "bank:central") (eur "1200.00"); credit (id "customer:2") (eur "1200.00") ]
+    transfer
+      "deposit-2"
+      2
+      ~tag:"deposit"
+      [ debit (id "bank:central") (eur "1200.00")
+      ; credit (id "customer:2") (eur "1200.00")
+      ]
   in
   let%bind () =
-    transfer "fee-1" 3 ~tag:"monthly fee"
+    transfer
+      "fee-1"
+      3
+      ~tag:"monthly fee"
       [ debit (id "customer:1") (eur "2.50"); credit (id "income:fees") (eur "2.50") ]
   in
   let leg k postings =
@@ -78,7 +94,9 @@ let write_example path =
       ]
   in
   let%bind buy =
-    leg "fx-9:buy" [ debit (id "fx:settlement") (gbp "85.00"); credit (id "customer:2") (gbp "85.00") ]
+    leg
+      "fx-9:buy"
+      [ debit (id "fx:settlement") (gbp "85.00"); credit (id "customer:2") (gbp "85.00") ]
   in
   let%bind () = ok (Ledger.Journal.append_linked j [ sell; buy ]) in
   let hold_id = Ledger.Hold_id.of_string "auth-1" in
@@ -104,8 +122,12 @@ let write_example path =
          ())
   in
   let%map () =
-    transfer "scheme-1" 9
-      [ debit (id "clearing:cards") (eur "20.00"); credit (id "bank:central") (eur "20.00") ]
+    transfer
+      "scheme-1"
+      9
+      [ debit (id "clearing:cards") (eur "20.00")
+      ; credit (id "bank:central") (eur "20.00")
+      ]
   in
   Ledger.Journal.close j
 ;;
@@ -178,7 +200,8 @@ let mapping_command =
 let export_command =
   Command.basic_or_error
     ~summary:"Print the journal entries a ledger journal exports to, and what blocks"
-    (let%map_open.Command journal = flag "-journal" (required string) ~doc:"FILE ledger journal"
+    (let%map_open.Command journal =
+       flag "-journal" (required string) ~doc:"FILE ledger journal"
      and mapping = flag "-mapping" (required string) ~doc:"FILE mapping (sexp)"
      and from = date_flag "-from" ~doc:"DATE first day (inclusive)"
      and to_ = date_flag "-to" ~doc:"DATE last day (inclusive)"
@@ -201,12 +224,18 @@ let sync_command =
   Async.Command.async_or_error
     ~summary:
       "Push a journal to a fresh simulated accounting system and reconcile the period"
-    (let%map_open.Command journal = flag "-journal" (required string) ~doc:"FILE ledger journal"
+    (let%map_open.Command journal =
+       flag "-journal" (required string) ~doc:"FILE ledger journal"
      and mapping = flag "-mapping" (required string) ~doc:"FILE mapping (sexp)"
      and from = flag "-from" (required date) ~doc:"DATE first day (inclusive)"
      and to_ = flag "-to" (required date) ~doc:"DATE last day (inclusive)"
      and lock = date_flag "-locked-through" ~doc:"DATE the system's lock date"
-     and reject = flag "-reject-next" (optional_with_default 0 int) ~doc:"N reject the next N entries" in
+     and reject =
+       flag
+         "-reject-next"
+         (optional_with_default 0 int)
+         ~doc:"N reject the next N entries"
+     in
      fun () ->
        let open Deferred.Or_error.Let_syntax in
        let%bind records = Deferred.return (read_records journal) in
@@ -217,7 +246,8 @@ let sync_command =
          Mapping.rules mapping
          |> List.map ~f:snd
          |> List.dedup_and_sort ~compare:Account_code.compare
-         |> List.map ~f:(fun c -> Chart.Account.create c ~name:(Account_code.to_string c) Asset)
+         |> List.map ~f:(fun c ->
+           Chart.Account.create c ~name:(Account_code.to_string c) Asset)
          |> Chart.create_exn
        in
        let categories =
@@ -240,7 +270,9 @@ let sync_command =
            (Period_lock.lock_through Period_lock.none d));
        Simulated.reject_next sim ~count:reject Validation_error;
        let export = Export.run ~from ~to_ ~mapping records in
-       let now = Time_ns.of_date_ofday ~zone:Time_float.Zone.utc to_ Time_ns.Ofday.start_of_day in
+       let now =
+         Time_ns.of_date_ofday ~zone:Time_float.Zone.utc to_ Time_ns.Ofday.start_of_day
+       in
        let%map tracker, run =
          Sync.push
            (Simulated.connector sim)

@@ -44,7 +44,12 @@ let () =
   let org = { Organisation.id = "org-1"; name = "Example Ltd" } in
   let tracker, run =
     Async.Thread_safe.block_on_async_exn (fun () ->
-      Sync.push (Simulated.connector sim) org Tracker.empty ~entries:export.entries ~now:at)
+      Sync.push
+        (Simulated.connector sim)
+        org
+        Tracker.empty
+        ~entries:export.entries
+        ~now:at)
     |> Or_error.ok_exn
   in
   let recon =
