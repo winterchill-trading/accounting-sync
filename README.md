@@ -165,6 +165,7 @@ digests are pinned in `test/test_stable.ml`.
 
 ## Docs
 
-- `AGENTS.md`: guide for AI coding agents working in this repository.
+- `AGENTS.md`: guide for AI coding agents working in this repository (one per
+  directory).
 - `CHANGES.md`.
 - odoc: `dune build @doc`.
