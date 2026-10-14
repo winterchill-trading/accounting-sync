@@ -127,42 +127,15 @@ let chart t org = with_access t org (fun _ -> t.chart)
 let tracking_categories t org = with_access t org (fun _ -> t.categories)
 let period_lock t org = with_access t org (fun s -> s.lock)
 
-(* The checks a manual-journal API runs, in its order; the first failure wins. *)
-let validate t (s : organisation_state) (entry : Journal_entry.t) =
-  let lines = List.mapi entry.lines ~f:(fun i l -> i + 1, l) in
-  let net =
-    List.fold entry.lines ~init:(Money.Amount.zero entry.currency) ~f:(fun acc l ->
-      Money.Amount.add_exn acc (Journal_entry.Line.signed l))
-  in
-  match
-    List.find lines ~f:(fun (_, (l : Journal_entry.Line.t)) ->
-      not (Chart.accepts t.chart l.account))
-  with
-  | Some (n, l) ->
-    Some
-      (Reason.create
-         Unmapped_account
-         ~detail:(sprintf "line %d (%s)" n (Account_code.to_string l.account)))
+let validate t (s : organisation_state) entry =
+  match Check.entry ~chart:t.chart ~categories:t.categories ~lock:s.lock entry with
+  | Some _ as reason -> reason
   | None ->
-    if not (Money.Amount.is_zero net)
-    then Some (Reason.create Unbalanced)
-    else (
-      match
-        List.find_map lines ~f:(fun (n, l) ->
-          match Tracking.check t.categories l.tracking with
-          | Ok () -> None
-          | Error e -> Some (sprintf "line %d: %s" n (Error.to_string_hum e)))
-      with
-      | Some detail -> Some (Reason.create Unknown_tracking ~detail)
-      | None ->
-        if Period_lock.is_locked s.lock entry.date
-        then Some (Reason.create Period_locked ~detail:(Date.to_string entry.date))
-        else (
-          match t.reject_next with
-          | n, reason when n > 0 ->
-            t.reject_next <- n - 1, reason;
-            Some (Reason.create reason ~detail:"rejected by test hook")
-          | _ -> None))
+    (match t.reject_next with
+     | n, reason when n > 0 ->
+       t.reject_next <- n - 1, reason;
+       Some (Reason.create reason ~detail:"rejected by test hook")
+     | _ -> None)
 ;;
 
 let answer_of (e : Remote_entry.t) : Connector.Answer.t option =
