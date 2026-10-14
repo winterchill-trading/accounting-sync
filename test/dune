@@ -1,0 +1,17 @@
+(library
+ (name accounting_sync_test)
+ (package accounting-sync)
+ (libraries
+  core
+  async_kernel
+  async
+  expect_test_helpers_core
+  zarith
+  money
+  ledger
+  accounting-sync)
+ (inline_tests
+  (flags
+   (:standard -source-tree-root .)))
+ (preprocess
+  (pps ppx_jane)))
