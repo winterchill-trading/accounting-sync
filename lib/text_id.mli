@@ -36,6 +36,7 @@ module Make
        (** Used in error messages, e.g. ["Accounting_sync.Account_code"]. *)
        val module_name : string
 
+       (** The longest id accepted. *)
        val max_length : int
      end)
     () : S

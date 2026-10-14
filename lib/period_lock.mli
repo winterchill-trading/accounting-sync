@@ -17,17 +17,21 @@ type t =
 (** Nothing locked. *)
 val none : t
 
+(** Whether an entry dated [date] falls in a closed period. *)
 val is_locked : t -> Date.t -> bool
 
 (** Moves the lock date; a lock date never moves backwards here. Reopening needs
     {!reopen_through}, so that it is a deliberate act. *)
 val lock_through : t -> Date.t -> t
 
+(** Sets the lock date to an earlier day, or removes it. *)
 val reopen_through : t -> Date.t option -> t
+(** Closes one month. *)
 val lock_period : t -> Period.t -> t
 
 (** Locked when either is: the later lock date and both sets of months. *)
 val union : t -> t -> t
+(** Reopens a month closed by {!lock_period}; the lock date is unaffected. *)
 val unlock_period : t -> Period.t -> t
 
 module Stable : sig

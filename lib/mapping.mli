@@ -47,6 +47,7 @@ end
 
 type t [@@deriving sexp, compare, equal]
 
+(** No rules: every account is unmapped. *)
 val empty : t
 
 (** Fails when one rule appears twice. *)
@@ -55,13 +56,17 @@ val create
   -> (Rule.t * Account_code.t) list
   -> t Or_error.t
 
+(** [create] that raises. *)
 val create_exn : ?tracking:(string * string) list -> (Rule.t * Account_code.t) list -> t
+(** Rules in the order they were added. *)
 val rules : t -> (Rule.t * Account_code.t) list
+(** The [(tag_key, category)] pairs. *)
 val tracking_rules : t -> (string * string) list
 
 (** Adds the rule or replaces its code. *)
 val set : t -> Rule.t -> Account_code.t -> t
 
+(** Drops the rule, if present. *)
 val remove : t -> Rule.t -> t
 
 (** The code for a ledger account. [account] is the account as opened in the ledger, if

@@ -26,6 +26,9 @@ module Run : sig
   [@@deriving sexp_of]
 end
 
+(** Stages [entries], refuses what cannot pass, sends the rest and records the answers.
+    Fails only when the system's lock, chart or categories cannot be read; a failed batch
+    is reported in {!Run.t.failed_batches}. *)
 val push
   :  ?max_entries:int (** per batch; see {!Batch.plan} *)
   -> ?lock:Period_lock.t (** local closed periods, combined with the system's *)
@@ -47,6 +50,7 @@ module Poll : sig
   [@@deriving sexp_of]
 end
 
+(** Asks about every submitted entry and records the decisions. *)
 val poll
   :  Connector.t
   -> Organisation.t

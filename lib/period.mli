@@ -10,15 +10,21 @@ type t = private
 
 include Comparable.S with type t := t
 
+(** The month [month] of [year]. *)
 val create : year:int -> month:Month.t -> t
 
 (** The period containing [date]. *)
 val of_date : Date.t -> t
 
+(** The first calendar day of the period. *)
 val first_day : t -> Date.t
+(** The last calendar day of the period. *)
 val last_day : t -> Date.t
+(** Whether [date] falls in the period. *)
 val contains : t -> Date.t -> bool
+(** The following month. *)
 val next : t -> t
+(** The preceding month. *)
 val prev : t -> t
 
 (** ["2026-10"]. *)

@@ -14,6 +14,7 @@ module Code : sig
   (** ["unmapped_account"], ["period_locked"], ... *)
   val to_string : t -> string
 
+  (** Parses [to_string]'s form. *)
   val of_string_or_error : string -> t Or_error.t
 
   (** Whether posting the same entry again can succeed without changing it: a period
@@ -34,6 +35,7 @@ type t =
   }
 [@@deriving sexp, compare, equal]
 
+(** [detail] defaults to [""]. *)
 val create : ?detail:string -> Code.t -> t
 
 module Stable : sig

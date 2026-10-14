@@ -52,18 +52,23 @@ module type S = sig
   (** Revokes access to the organisation. Entries already posted stay in the system. *)
   val disconnect : t -> Organisation.t -> unit Deferred.Or_error.t
 
+  (** The organisation's chart of accounts. *)
   val chart : t -> Organisation.t -> Chart.t Deferred.Or_error.t
+
+  (** The organisation's tracking categories and their options. *)
   val tracking_categories : t -> Organisation.t -> Tracking.Category.t list Deferred.Or_error.t
 
   (** The system's own closed periods, to check entries against before sending. *)
   val period_lock : t -> Organisation.t -> Period_lock.t Deferred.Or_error.t
 
+  (** Sends entries under their push keys; answers each key. *)
   val post
     :  t
     -> Organisation.t
     -> (Push_key.t * Journal_entry.t) list
     -> (Push_key.t * Answer.t) list Deferred.Or_error.t
 
+  (** The current answer for each known remote id. *)
   val poll
     :  t
     -> Organisation.t
@@ -80,25 +85,40 @@ end
 (** A connector of any implementation. *)
 type t = T : (module S with type t = 'a) * 'a -> t
 
+(** {2 Dispatch}
+
+    Each function calls the implementation's operation of the same name; see {!S}. *)
+
+(** {!S.system}. *)
 val system : t -> string
+(** {!S.authorization_url}. *)
 val authorization_url : t -> state:string -> organisation_name:string -> string Deferred.Or_error.t
+(** {!S.complete_authorization}. *)
 val complete_authorization : t -> state:string -> Organisation.t list Deferred.Or_error.t
+(** {!S.disconnect}. *)
 val disconnect : t -> Organisation.t -> unit Deferred.Or_error.t
+(** {!S.chart}. *)
 val chart : t -> Organisation.t -> Chart.t Deferred.Or_error.t
+(** {!S.tracking_categories}. *)
 val tracking_categories : t -> Organisation.t -> Tracking.Category.t list Deferred.Or_error.t
+(** {!S.period_lock}. *)
 val period_lock : t -> Organisation.t -> Period_lock.t Deferred.Or_error.t
 
+(** {!S.post}. *)
 val post
   :  t
   -> Organisation.t
   -> (Push_key.t * Journal_entry.t) list
   -> (Push_key.t * Answer.t) list Deferred.Or_error.t
 
+(** {!S.poll}. *)
 val poll
   :  t
   -> Organisation.t
   -> Remote_id.t list
   -> (Remote_id.t * Answer.t) list Deferred.Or_error.t
 
+(** {!S.void}. *)
 val void : t -> Organisation.t -> Remote_id.t -> unit Deferred.Or_error.t
+(** {!S.view_url}. *)
 val view_url : t -> Organisation.t -> Remote_id.t -> string option

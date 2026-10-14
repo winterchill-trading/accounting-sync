@@ -23,6 +23,7 @@ module Account_line : sig
     }
   [@@deriving sexp_of, compare, equal]
 
+  (** The three views agree. *)
   val matched : t -> bool
 end
 
@@ -36,6 +37,7 @@ module Currency_line : sig
     }
   [@@deriving sexp_of, compare, equal]
 
+  (** Exported and posted debits and line counts agree. *)
   val matched : t -> bool
 end
 
@@ -58,6 +60,7 @@ type t =
 (** Whether everything is posted unchanged and every total agrees. *)
 val reconciled : t -> bool
 
+(** Reconciles the transactions of [records] dated in [from, to_] against [tracker]. *)
 val run
   :  ?basis:Export.Date_basis.t
   -> ?touching:(Ledger.Account_id.t -> bool)

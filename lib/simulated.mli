@@ -31,6 +31,7 @@ module Remote_entry : sig
   [@@deriving sexp_of, compare, equal]
 end
 
+(** A system with no organisations, consents or entries yet. *)
 val create
   :  ?system:string (** default ["simulated"] *)
   -> ?number_prefix:string (** default ["JE"] *)
@@ -46,7 +47,9 @@ val create
     [organisations]. Fails for a state no authorization URL was issued for. *)
 val grant : t -> state:string -> organisations:Organisation.t list -> unit Or_error.t
 
+(** Replaces the chart, e.g. to archive an account mid-test. *)
 val set_chart : t -> Chart.t -> unit
+(** The organisation's closed periods. *)
 val set_period_lock : t -> Organisation.t -> Period_lock.t -> unit
 
 (** The next [count] valid entries are rejected with [reason] (a demo of a closed

@@ -25,6 +25,7 @@ module Item : sig
     }
   [@@deriving sexp_of, compare, equal]
 
+  (** The key the current attempt is sent under. *)
   val push_key : t -> Push_key.t
 
   module Stable : sig
@@ -36,7 +37,9 @@ end
 
 type t [@@deriving sexp_of, compare, equal]
 
+(** No entries. *)
 val empty : t
+(** The entry under [key], if staged. *)
 val find : t -> Entry_key.t -> Item.t option
 
 (** In key order. *)

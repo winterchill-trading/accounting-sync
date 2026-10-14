@@ -19,6 +19,7 @@ module Account_type : sig
   (** ["asset"], ["bank"], ... *)
   val to_string : t -> string
 
+  (** Parses [to_string]'s form, ignoring case. *)
   val of_string_or_error : string -> t Or_error.t
 
   module Stable : sig
@@ -54,11 +55,13 @@ type t [@@deriving sexp, compare, equal]
 (** Fails on a duplicate code or an empty name. *)
 val create : Account.t list -> t Or_error.t
 
+(** [create] that raises. *)
 val create_exn : Account.t list -> t
 
 (** Accounts in code order. *)
 val accounts : t -> Account.t list
 
+(** The account with [code], active or archived. *)
 val find : t -> Account_code.t -> Account.t option
 
 (** Whether [code] exists and is active. *)
