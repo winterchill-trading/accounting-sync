@@ -1,0 +1,7 @@
+(executable
+ (name main)
+ (public_name accounting-sync)
+ (package accounting-sync)
+ (libraries core core_unix.command_unix async money ledger accounting-sync)
+ (preprocess
+  (pps ppx_jane)))
