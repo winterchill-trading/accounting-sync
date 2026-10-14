@@ -77,7 +77,7 @@ val run
            exported. Default: all. *)
   -> ?narration:(Transaction.t -> string)
        (** default: the first non-empty of the first entry's reference, remittance
-           information and transfer tag *)
+           information and transfer tag, else the entry's ledger code *)
   -> ?fx:(Money.Currency.t -> Date.t -> Money.Rate.t option)
        (** rate to the reporting currency for an entry's currency and date *)
   -> mapping:Mapping.t

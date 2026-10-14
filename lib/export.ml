@@ -62,8 +62,10 @@ let default_narration (tx : Transaction.t) =
     | Transfer tag -> tag
     | _ -> ""
   in
-  List.find [ first.reference; first.remittance_info; tag ] ~f:(Fn.non String.is_empty)
-  |> Option.value ~default:""
+  List.find
+    [ first.reference; first.remittance_info; tag ]
+    ~f:(Fn.non String.is_empty)
+  |> Option.value ~default:(Ledger.Entry.Code.to_string first.code)
 ;;
 
 let parent id = Option.value (Ledger.Account_id.parent_of_pending id) ~default:id
