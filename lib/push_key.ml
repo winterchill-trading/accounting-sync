@@ -9,7 +9,7 @@ include
     ()
 
 let create entry ~attempt =
-  if attempt < 1
+  if Int.( < ) attempt 1
   then Or_error.error_s [%message "attempt must be at least 1" (attempt : int)]
   else of_string_or_error (sprintf "%s:%d" (Entry_key.to_string entry) attempt)
 ;;
