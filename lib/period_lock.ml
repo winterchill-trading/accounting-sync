@@ -30,6 +30,12 @@ let lock_through t date =
 ;;
 
 let reopen_through t through = { t with through }
+let union a b =
+  { through = Option.merge a.through b.through ~f:Date.max
+  ; periods = Set.union a.periods b.periods
+  }
+;;
+
 let lock_period t p = { t with periods = Set.add t.periods p }
 let unlock_period t p = { t with periods = Set.remove t.periods p }
 

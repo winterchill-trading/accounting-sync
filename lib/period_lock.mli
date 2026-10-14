@@ -25,6 +25,9 @@ val lock_through : t -> Date.t -> t
 
 val reopen_through : t -> Date.t option -> t
 val lock_period : t -> Period.t -> t
+
+(** Locked when either is: the later lock date and both sets of months. *)
+val union : t -> t -> t
 val unlock_period : t -> Period.t -> t
 
 module Stable : sig
