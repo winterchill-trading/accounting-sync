@@ -45,9 +45,7 @@ include Repr
 let empty = { rules = []; tracking = [] }
 
 let validate t =
-  match
-    List.find_a_dup t.rules ~compare:(fun (a, _) (b, _) -> Rule.compare a b)
-  with
+  match List.find_a_dup t.rules ~compare:(fun (a, _) (b, _) -> Rule.compare a b) with
   | None -> Ok t
   | Some (rule, _) -> Or_error.error_s [%message "rule mapped twice" (rule : Rule.t)]
 ;;
@@ -104,8 +102,7 @@ let resolve t id ~account =
   in
   match exact with
   | Some _ -> exact
-  | None ->
-    Option.first_some (prefix ()) (Option.first_some (tag ()) (class_ ()))
+  | None -> Option.first_some (prefix ()) (Option.first_some (tag ()) (class_ ()))
 ;;
 
 let tracking t ~account =

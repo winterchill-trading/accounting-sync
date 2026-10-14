@@ -97,8 +97,8 @@ let total t =
     | Credit -> acc)
 ;;
 
-(* The stable sexp is the canonical form: it names every field and its text never
-   changes with the unstable type's derivations. *)
+(* The stable sexp is the canonical form: it names every field and its text never changes
+   with the unstable type's derivations. *)
 let digest t = Md5.to_hex (Md5.digest_string (Sexp.to_string (Repr.sexp_of_t t)))
 
 module Stable = struct

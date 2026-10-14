@@ -46,8 +46,8 @@ type t = private
     least this much. *)
 val max_narration : int
 
-(** Fails unless there are at least two lines, every amount is positive and in
-    [currency], debits equal credits, and [fx] (when given) has [currency] as its base. *)
+(** Fails unless there are at least two lines, every amount is positive and in [currency],
+    debits equal credits, and [fx] (when given) has [currency] as its base. *)
 val create
   :  key:Entry_key.t
   -> transaction:Ledger.Idempotency_key.t

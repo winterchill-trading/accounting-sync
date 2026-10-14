@@ -2,9 +2,9 @@
 
     {!Export} turns ledger records into system-neutral {!Journal_entry}s through a
     {!Mapping} onto a {!Chart} of accounts, one entry per transaction and currency under
-    an idempotent {!Entry_key}. A {!Tracker} holds each entry's {!Status}; {!Sync}
-    pushes pending entries in {!Batch}es through a {!Connector} (such as {!Simulated})
-    and polls for decisions; {!Reconciliation} checks a period against the ledger. *)
+    an idempotent {!Entry_key}. A {!Tracker} holds each entry's {!Status}; {!Sync} pushes
+    pending entries in {!Batch}es through a {!Connector} (such as {!Simulated}) and polls
+    for decisions; {!Reconciliation} checks a period against the ledger. *)
 
 (** {1 Identifiers} *)
 

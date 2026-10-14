@@ -33,10 +33,19 @@ module type S = sig
     -> organisation_name:string
     -> string Deferred.Or_error.t
 
-  val complete_authorization : t -> state:string -> Organisation.t list Deferred.Or_error.t
+  val complete_authorization
+    :  t
+    -> state:string
+    -> Organisation.t list Deferred.Or_error.t
+
   val disconnect : t -> Organisation.t -> unit Deferred.Or_error.t
   val chart : t -> Organisation.t -> Chart.t Deferred.Or_error.t
-  val tracking_categories : t -> Organisation.t -> Tracking.Category.t list Deferred.Or_error.t
+
+  val tracking_categories
+    :  t
+    -> Organisation.t
+    -> Tracking.Category.t list Deferred.Or_error.t
+
   val period_lock : t -> Organisation.t -> Period_lock.t Deferred.Or_error.t
 
   val post

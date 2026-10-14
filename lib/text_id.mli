@@ -1,9 +1,9 @@
 (** Short identifiers checked once, at the edge.
 
     An id is 1 to [max_length] characters from [A-Z a-z 0-9 _ - . : / @ +]. That covers
-    account codes such as [4000] or [1200-EUR], remote entry ids, and entry keys built from
-    a ledger idempotency key and a currency code, while keeping every id safe to print in
-    a report, a file name or a log line without quoting. *)
+    account codes such as [4000] or [1200-EUR], remote entry ids, and entry keys built
+    from a ledger idempotency key and a currency code, while keeping every id safe to
+    print in a report, a file name or a log line without quoting. *)
 
 open! Core
 
@@ -20,8 +20,8 @@ module type S = sig
 
   module Stable : sig
     module V1 : sig
-      (** Bin_prot is the plain string, so the encoding never changes with the
-          validation rules. *)
+      (** Bin_prot is the plain string, so the encoding never changes with the validation
+          rules. *)
       type nonrec t = t [@@deriving bin_io, sexp, compare, equal, hash]
     end
   end

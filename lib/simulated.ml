@@ -97,7 +97,8 @@ let authorization_url t ~state ~organisation_name =
             "simulated://%s/consent?state=%s&organisation=%s"
             t.system
             state
-            (String.map organisation_name ~f:(fun c -> if Char.is_alphanum c then c else '+')))))
+            (String.map organisation_name ~f:(fun c ->
+               if Char.is_alphanum c then c else '+')))))
 ;;
 
 let complete_authorization t ~state =
@@ -148,7 +149,8 @@ let answer_of (e : Remote_entry.t) : Connector.Answer.t option =
 
 let post_one t s (push_key, (entry : Journal_entry.t)) =
   match
-    List.find s.entries ~f:(fun (e : Remote_entry.t) -> Push_key.equal e.push_key push_key)
+    List.find s.entries ~f:(fun (e : Remote_entry.t) ->
+      Push_key.equal e.push_key push_key)
   with
   | Some e ->
     (* A repeated push key gets the first answer back; nothing new is stored. *)
@@ -161,7 +163,9 @@ let post_one t s (push_key, (entry : Journal_entry.t)) =
              ; reason = Reason.create Validation_error ~detail:"entry was voided"
              }) )
   | None ->
-    let id = Remote_id.of_string (sprintf "%s_%06d" (String.lowercase t.number_prefix) t.next_id) in
+    let id =
+      Remote_id.of_string (sprintf "%s_%06d" (String.lowercase t.number_prefix) t.next_id)
+    in
     t.next_id <- t.next_id + 1;
     let number = sprintf "%s-%04d" t.number_prefix (List.length s.entries + 1) in
     let decision = validate t s entry in
@@ -175,16 +179,13 @@ let post_one t s (push_key, (entry : Journal_entry.t)) =
     if t.decide_on_poll
     then (
       (* Remember the decision, show [Received] until the first poll. *)
-      s.entries
-      <- { stored with state = Received } :: List.tl_exn s.entries;
+      s.entries <- { stored with state = Received } :: List.tl_exn s.entries;
       Hashtbl.set t.decisions ~key:(Remote_id.to_string id) ~data:state;
       push_key, Connector.Answer.Accepted id)
     else push_key, Option.value_exn (answer_of stored)
 ;;
 
-let post t org entries =
-  with_access t org (fun s -> List.map entries ~f:(post_one t s))
-;;
+let post t org entries = with_access t org (fun s -> List.map entries ~f:(post_one t s))
 
 let update s id ~f =
   s.entries
@@ -195,8 +196,9 @@ let update s id ~f =
 let poll t org ids =
   with_access t org (fun s ->
     List.filter_map ids ~f:(fun id ->
-      Option.iter (Hashtbl.find_and_remove t.decisions (Remote_id.to_string id)) ~f:(fun state ->
-        update s id ~f:(fun e -> { e with state }));
+      Option.iter
+        (Hashtbl.find_and_remove t.decisions (Remote_id.to_string id))
+        ~f:(fun state -> update s id ~f:(fun e -> { e with state }));
       List.find s.entries ~f:(fun (e : Remote_entry.t) -> Remote_id.equal e.id id)
       |> Option.bind ~f:answer_of
       |> Option.map ~f:(fun answer -> id, answer)))
@@ -210,7 +212,9 @@ let void t org id =
   | Some { state = Posted | Voided; _ } ->
     update s id ~f:(fun e -> { e with state = Voided });
     return (Ok ())
-  | Some _ -> Deferred.Or_error.error_s [%message "only posted entries can be voided" (id : Remote_id.t)]
+  | Some _ ->
+    Deferred.Or_error.error_s
+      [%message "only posted entries can be voided" (id : Remote_id.t)]
   | None -> Deferred.Or_error.error_s [%message "unknown entry" (id : Remote_id.t)]
 ;;
 

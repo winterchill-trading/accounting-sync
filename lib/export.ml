@@ -19,7 +19,8 @@ module Transaction = struct
     List.filter_map records ~f:(fun (r : Ledger.Record.t) ->
       match Ledger.Record.entries r with
       | [] -> None
-      | first :: _ as entries -> Some { key = first.idempotency_key; seq = r.seq; entries })
+      | first :: _ as entries ->
+        Some { key = first.idempotency_key; seq = r.seq; entries })
   ;;
 
   let date basis t =
@@ -62,17 +63,24 @@ let default_narration (tx : Transaction.t) =
     | Transfer tag -> tag
     | _ -> ""
   in
-  List.find
-    [ first.reference; first.remittance_info; tag ]
-    ~f:(Fn.non String.is_empty)
+  List.find [ first.reference; first.remittance_info; tag ] ~f:(Fn.non String.is_empty)
   |> Option.value ~default:(Ledger.Entry.Code.to_string first.code)
 ;;
 
 let parent id = Option.value (Ledger.Account_id.parent_of_pending id) ~default:id
 
-(* One currency of one transaction. Postings are netted per (code, tracking); the
-   sources of a line are the ledger accounts that fed it. *)
-let export_currency ~mapping ~accounts ~key ~date ~narration ~reference ~fx ~tx currency
+(* One currency of one transaction. Postings are netted per (code, tracking); the sources
+   of a line are the ledger accounts that fed it. *)
+let export_currency
+  ~mapping
+  ~accounts
+  ~key
+  ~date
+  ~narration
+  ~reference
+  ~fx
+  ~tx
+  currency
   postings
   =
   let account id = Map.find accounts (parent id) in
@@ -89,8 +97,7 @@ let export_currency ~mapping ~accounts ~key ~date ~narration ~reference ~fx ~tx 
       let tracking = Mapping.tracking mapping ~account:acct in
       Hashtbl.update lines (code, tracking) ~f:(fun prev ->
         let net, sources = Option.value prev ~default:(Money.Amount.zero currency, []) in
-        ( Money.Amount.add_exn net (Ledger.Posting.signed p)
-        , parent p.account :: sources )));
+        Money.Amount.add_exn net (Ledger.Posting.signed p), parent p.account :: sources));
   if not (Hashtbl.is_empty unmapped)
   then
     `Blocked
@@ -151,10 +158,13 @@ let run
   records
   =
   let accounts =
-    List.fold records ~init:Ledger.Account_id.Map.empty ~f:(fun acc (r : Ledger.Record.t) ->
-      match r.event with
-      | Account_opened a -> Map.set acc ~key:(Ledger.Account.id a) ~data:a
-      | _ -> acc)
+    List.fold
+      records
+      ~init:Ledger.Account_id.Map.empty
+      ~f:(fun acc (r : Ledger.Record.t) ->
+        match r.event with
+        | Account_opened a -> Map.set acc ~key:(Ledger.Account.id a) ~data:a
+        | _ -> acc)
   in
   let in_range d =
     Option.for_all from ~f:(fun f -> Date.( >= ) d f)
@@ -193,10 +203,18 @@ let run
           currency
           postings))
   in
-  { entries = List.filter_map results ~f:(function `Entry e -> Some e | _ -> None)
-  ; blocked = List.filter_map results ~f:(function `Blocked b -> Some b | _ -> None)
+  { entries =
+      List.filter_map results ~f:(function
+        | `Entry e -> Some e
+        | _ -> None)
+  ; blocked =
+      List.filter_map results ~f:(function
+        | `Blocked b -> Some b
+        | _ -> None)
   ; netted_out =
-      List.filter_map results ~f:(function `Netted_out k -> Some k | _ -> None)
+      List.filter_map results ~f:(function
+        | `Netted_out k -> Some k
+        | _ -> None)
   }
 ;;
 

@@ -9,11 +9,11 @@
     v}
 
     [Pending] is exported but not known to the remote system yet. [Submitted] means the
-    system accepted the entry and will decide later (some systems queue manual
-    journals). [Posted] is booked remotely; the only way out is a void, which reverses
-    it there. [Rejected] carries the reason; a retry starts a new attempt. Repeating an
-    answer that is already recorded (the same remote id posted twice) is accepted and
-    changes nothing, because status polls overlap. *)
+    system accepted the entry and will decide later (some systems queue manual journals).
+    [Posted] is booked remotely; the only way out is a void, which reverses it there.
+    [Rejected] carries the reason; a retry starts a new attempt. Repeating an answer that
+    is already recorded (the same remote id posted twice) is accepted and changes nothing,
+    because status polls overlap. *)
 
 open! Core
 

@@ -6,7 +6,6 @@
     a new entry. *)
 
 open! Core
-
 include Text_id.S
 
 (** Fails unless [attempt >= 1]. *)

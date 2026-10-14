@@ -4,12 +4,12 @@
     a group of linked entries booked together (an exchange's legs and its fee). Each
     transaction becomes one journal entry per currency it moves, keyed
     {!Entry_key.create}. Postings to accounts that map to the same code and tracking
-    options are netted into one line, so a hold placed and released inside one
-    transaction leaves nothing behind, and a transaction that nets to zero everywhere
-    produces no entry at all.
+    options are netted into one line, so a hold placed and released inside one transaction
+    leaves nothing behind, and a transaction that nets to zero everywhere produces no
+    entry at all.
 
-    A transaction with a posting the mapping cannot place is not exported; it is
-    reported as blocked, with the accounts that need a rule. *)
+    A transaction with a posting the mapping cannot place is not exported; it is reported
+    as blocked, with the accounts that need a rule. *)
 
 open! Core
 

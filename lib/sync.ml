@@ -85,7 +85,8 @@ let push
       ~init:(tracker, [], [])
       ~f:(fun (tracker, failed, answers) (batch : Batch.t) ->
         let request =
-          List.map batch.entries ~f:(fun (e : Journal_entry.t) -> Map.find_exn by_entry e.key, e)
+          List.map batch.entries ~f:(fun (e : Journal_entry.t) ->
+            Map.find_exn by_entry e.key, e)
         in
         match%map.Deferred Connector.post connector organisation request with
         | Error e -> tracker, (batch.id, e) :: failed, answers

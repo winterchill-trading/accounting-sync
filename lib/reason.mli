@@ -17,9 +17,9 @@ module Code : sig
   (** Parses [to_string]'s form. *)
   val of_string_or_error : string -> t Or_error.t
 
-  (** Whether posting the same entry again can succeed without changing it: a period
-      can be reopened, a validation error may be transient. The others need a new
-      mapping, chart or entry first. *)
+  (** Whether posting the same entry again can succeed without changing it: a period can
+      be reopened, a validation error may be transient. The others need a new mapping,
+      chart or entry first. *)
   val retryable : t -> bool
 
   module Stable : sig

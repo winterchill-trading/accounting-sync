@@ -1,10 +1,10 @@
 (** Groups entries for sending: one period per batch, a bounded number of entries per
     batch, and nothing from a locked period.
 
-    Systems limit how many entries one request may carry, and a sync that fails half
-    way should leave whole periods either done or not started where possible, so
-    batches never mix periods. Entries are ordered by date, then key, which makes the
-    batches of the same input identical between runs. *)
+    Systems limit how many entries one request may carry, and a sync that fails half way
+    should leave whole periods either done or not started where possible, so batches never
+    mix periods. Entries are ordered by date, then key, which makes the batches of the
+    same input identical between runs. *)
 
 open! Core
 

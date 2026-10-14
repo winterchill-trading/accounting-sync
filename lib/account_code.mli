@@ -4,5 +4,4 @@
     accounts, as they are in most accounting systems. *)
 
 open! Core
-
 include Text_id.S

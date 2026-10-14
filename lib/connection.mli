@@ -6,11 +6,11 @@
          +--cancel--> Cancelled
     v}
 
-    A connection starts when the user is sent to the system's consent page with a
-    one-time [state] value; it is completed by that same value coming back, and by
-    choosing one of the organisations the consent covers. Cancelled and disconnected
-    connections are final: connecting again starts a new connection, so that the
-    entries already posted stay attached to the organisation they were posted to. *)
+    A connection starts when the user is sent to the system's consent page with a one-time
+    [state] value; it is completed by that same value coming back, and by choosing one of
+    the organisations the consent covers. Cancelled and disconnected connections are
+    final: connecting again starts a new connection, so that the entries already posted
+    stay attached to the organisation they were posted to. *)
 
 open! Core
 
@@ -33,9 +33,9 @@ type t =
 (** Fails on an empty [state]. *)
 val start : state:string -> at:Time_ns.t -> t Or_error.t
 
-(** Completes a pending connection whose state is [state], with [organisation] chosen
-    from [granted] (the organisations the consent covers). Fails on another state value,
-    an organisation outside the grant, or a connection that is not pending. *)
+(** Completes a pending connection whose state is [state], with [organisation] chosen from
+    [granted] (the organisations the consent covers). Fails on another state value, an
+    organisation outside the grant, or a connection that is not pending. *)
 val select
   :  t
   -> state:string

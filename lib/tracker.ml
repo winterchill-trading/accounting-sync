@@ -45,7 +45,10 @@ let stage t entries =
       let key = entry.key in
       match Map.find t key with
       | None ->
-        ( Map.set t ~key ~data:{ Item.entry; status = Pending; attempt = 1; replacement = None }
+        ( Map.set
+            t
+            ~key
+            ~data:{ Item.entry; status = Pending; attempt = 1; replacement = None }
         , `Added key )
       | Some (item : Item.t) ->
         (match item.status with

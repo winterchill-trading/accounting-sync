@@ -1,11 +1,11 @@
 (** One sync against a connected organisation: stage, check, batch, post, record.
 
-    {!push} stages a fresh export into the tracker, refuses locally what is certain to
-    be refused (closed periods, codes missing from the chart, unknown tracking options)
+    {!push} stages a fresh export into the tracker, refuses locally what is certain to be
+    refused (closed periods, codes missing from the chart, unknown tracking options)
     without sending it, sends the rest in batches and records every answer. A batch whose
     request fails leaves its entries pending under the same push keys, so the next sync
-    resends them and the remote system books each at most once. {!poll} asks about
-    entries the system accepted but has not decided yet.
+    resends them and the remote system books each at most once. {!poll} asks about entries
+    the system accepted but has not decided yet.
 
     Both return the new tracker value; storing it is the caller's job. *)
 
@@ -58,8 +58,8 @@ val poll
   -> now:Time_ns.t
   -> (Tracker.t * Poll.t) Deferred.Or_error.t
 
-(** Voids the remote entry of a posted entry and records it; with a replacement waiting,
-    a later {!Tracker.apply} [Retry] (or [~retry:true] here) queues the new content. *)
+(** Voids the remote entry of a posted entry and records it; with a replacement waiting, a
+    later {!Tracker.apply} [Retry] (or [~retry:true] here) queues the new content. *)
 val void
   :  ?retry:bool
   -> Connector.t

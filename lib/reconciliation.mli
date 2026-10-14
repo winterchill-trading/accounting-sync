@@ -6,10 +6,10 @@
     - [exported]: the net movement of the entries an export builds now;
     - [posted]: the net movement of the entries the tracker says are posted.
 
-    [ledger] and [exported] differ only where entries are blocked; [exported] and
-    [posted] differ where something is not pushed, pending, rejected, changed after
-    posting, or posted but no longer in the export ("extra"). A period reconciles when
-    all three agree and every entry is posted unchanged. *)
+    [ledger] and [exported] differ only where entries are blocked; [exported] and [posted]
+    differ where something is not pushed, pending, rejected, changed after posting, or
+    posted but no longer in the export ("extra"). A period reconciles when all three agree
+    and every entry is posted unchanged. *)
 
 open! Core
 
@@ -53,7 +53,8 @@ type t =
   ; extra : int (** posted, dated in the period, but no longer exported *)
   ; blocked : int (** transactions the mapping cannot place *)
   ; currencies : Currency_line.t list
-  ; accounts : Account_line.t list (** only lines where the three views differ, unless [~all] *)
+  ; accounts : Account_line.t list
+  (** only lines where the three views differ, unless [~all] *)
   }
 [@@deriving sexp_of]
 

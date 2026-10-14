@@ -6,7 +6,6 @@
     gives the same keys, which is what lets a sync skip entries it already posted. *)
 
 open! Core
-
 include Text_id.S
 
 (** [create ~transaction currency] is ["<transaction>:<currency>"]. *)

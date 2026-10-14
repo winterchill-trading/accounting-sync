@@ -66,7 +66,8 @@ end
 
 let net_of_entries entries =
   List.concat_map entries ~f:(fun (e : Journal_entry.t) ->
-    List.map e.lines ~f:(fun l -> (e.currency, Some l.account), Journal_entry.Line.signed l))
+    List.map e.lines ~f:(fun l ->
+      (e.currency, Some l.account), Journal_entry.Line.signed l))
 ;;
 
 let run
@@ -106,16 +107,17 @@ let run
       | Posted _ when in_range i.entry.date -> Some i.entry
       | _ -> None)
   in
-  let extra =
-    List.count posted_entries ~f:(fun e -> not (Set.mem exported_keys e.key))
-  in
-  (* The ledger view: every posting of the period's transactions, placed by the
-     mapping, without netting into entries. *)
+  let extra = List.count posted_entries ~f:(fun e -> not (Set.mem exported_keys e.key)) in
+  (* The ledger view: every posting of the period's transactions, placed by the mapping,
+     without netting into entries. *)
   let accounts_by_id =
-    List.fold records ~init:Ledger.Account_id.Map.empty ~f:(fun acc (r : Ledger.Record.t) ->
-      match r.event with
-      | Account_opened a -> Map.set acc ~key:(Ledger.Account.id a) ~data:a
-      | _ -> acc)
+    List.fold
+      records
+      ~init:Ledger.Account_id.Map.empty
+      ~f:(fun acc (r : Ledger.Record.t) ->
+        match r.event with
+        | Account_opened a -> Map.set acc ~key:(Ledger.Account.id a) ~data:a
+        | _ -> acc)
   in
   let parent id = Option.value (Ledger.Account_id.parent_of_pending id) ~default:id in
   let ledger_net =
@@ -129,13 +131,14 @@ let run
       List.concat_map tx.entries ~f:(fun e ->
         List.map e.postings ~f:(fun p ->
           let code =
-            Mapping.resolve mapping p.account ~account:(Map.find accounts_by_id (parent p.account))
+            Mapping.resolve
+              mapping
+              p.account
+              ~account:(Map.find accounts_by_id (parent p.account))
           in
           (Ledger.Entry.currency e, code), Ledger.Posting.signed p)))
   in
-  let sum alist =
-    Map.of_alist_reduce (module Key) alist ~f:Money.Amount.add_exn
-  in
+  let sum alist = Map.of_alist_reduce (module Key) alist ~f:Money.Amount.add_exn in
   let ledger = sum ledger_net in
   let exported = sum (net_of_entries export.entries) in
   let posted = sum (net_of_entries posted_entries) in

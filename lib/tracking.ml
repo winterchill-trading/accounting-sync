@@ -39,7 +39,8 @@ let check (categories : Category.t list) (assignments : Assignment.t list) =
         match
           List.find categories ~f:(fun (c : Category.t) -> String.equal c.name a.category)
         with
-        | None -> Or_error.error_s [%message "unknown tracking category" ~category:a.category]
+        | None ->
+          Or_error.error_s [%message "unknown tracking category" ~category:a.category]
         | Some c when not (List.mem c.options a.option ~equal:String.equal) ->
           Or_error.error_s
             [%message "unknown tracking option" ~category:a.category ~option:a.option]

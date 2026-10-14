@@ -55,15 +55,12 @@ let equal a b = Repr.equal (accounts a) (accounts b)
 let sexp_of_t t = Repr.sexp_of_t (accounts t)
 
 let create (accounts : Account.t list) =
-  match
-    List.find accounts ~f:(fun a -> String.is_empty (String.strip a.name))
-  with
+  match List.find accounts ~f:(fun a -> String.is_empty (String.strip a.name)) with
   | Some a ->
-    Or_error.error_s [%message "chart account without a name" ~code:(a.code : Account_code.t)]
+    Or_error.error_s
+      [%message "chart account without a name" ~code:(a.code : Account_code.t)]
   | None ->
-    (match
-       Account_code.Map.of_alist (List.map accounts ~f:(fun a -> a.code, a))
-     with
+    (match Account_code.Map.of_alist (List.map accounts ~f:(fun a -> a.code, a)) with
      | `Ok t -> Ok t
      | `Duplicate_key code ->
        Or_error.error_s [%message "duplicate account code" (code : Account_code.t)])
